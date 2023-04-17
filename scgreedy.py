@@ -41,15 +41,10 @@ def scgreedy(instance: Instance):
             cost = compute_cost(solution, instance)
             print(f"Total cost: {cost}")
             break
-        else:
-            # print("Adding column {}".format(best_i))
-            solution.append(best_i)
-            # print("Current solution: {}".format(solution))
 
-            print(
-                f"Completion: {(rowcounts.nonzero()[0].shape[0] / instance.m):.4f}% ",
-                end="\r",
-            )
+        # print("Adding column {}".format(best_i))
+        solution.append(best_i)
+        # print("Current solution: {}".format(solution))
 
         # Now update rowcounts and colcounts
         bestcol = instance.matrix[best_i]
@@ -57,25 +52,31 @@ def scgreedy(instance: Instance):
         # now, for each row that has just been covered by best_i, look for all the columns that would cover such row, and decrease their colcount by 1,
         # but only if that row was not already covered before.
         for r in bestcol:
-            relative_columns = transposed_matrix[r]
-            for rc in relative_columns:
-                if rc == -1:
-                    break
-                if rowcounts[r] == 0:
-                    if colcounts[rc] > 0:
-                        colcounts[rc] -= 1
             if r == -1:
                 break
+            if rowcounts[r] == 0:
+                relative_columns = transposed_matrix[r]
+                for rc in relative_columns:
+                    if rc == -1:
+                        break
+                    # if colcounts[rc] > 0:
+                    colcounts[rc] -= 1
+                    assert colcounts[rc] >= 0
+
             rowcounts[r] += 1
-    print(rowcounts)
+
+        print(
+            f"Completion: {(rowcounts.nonzero()[0].shape[0] / instance.m) * 100:.3f}% ",
+            end="\r",
+        )
+
     return solution
 
 
 if __name__ == "__main__":
-    instance_path = os.path.join("rail", "instances", "rail582")
+    # instance_path = os.path.join("rail", "instances", "rail507")
+    # instance_path = os.path.join("rail", "instances", "rail516")
+    # instance_path = os.path.join("rail", "instances", "rail582")
+    instance_path = os.path.join("rail", "instances", "rail2536")
     instance = import_instance(instance_path)
     solution = scgreedy(instance)
-
-    ##TODO: capire perché ultima riga non viene coperta? o è giusto ma non sto capendo il problema?
-
-    pass
