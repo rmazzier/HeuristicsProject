@@ -2,17 +2,23 @@ import numpy as np
 import os
 import time
 
-from utils import import_instance, Instance, transpose_column_major, compute_cost
+from utils import (
+    import_instance,
+    Instance,
+    transpose_column_major,
+    compute_cost,
+    solution_is_valid,
+    save_solution_to_file,
+)
 
 
-def scgreedy(instance: Instance):
+def scGreedy(instance: Instance):
     """Solve the set covering problem on a given instance using the greedy algorithm"""
 
     # at each iteration, i must select the column that maximizes the ratio covered_rows/cost
 
-    print("--- Start scgreedy algorithm ---")
-    # Get the transposed column-major matrix
-    transposed_matrix = transpose_column_major(instance.matrix, instance.m)
+    print("--- Start scGreedy algorithm ---")
+    start = time.time()
 
     # list of zero-based indices
     solution = []
@@ -35,11 +41,19 @@ def scgreedy(instance: Instance):
 
         # Check wether no more rows can be covered, and if so, break
         if best_i == -1:
-            print(
-                f"\nAlgorithm completed. {rowcounts.nonzero()[0].shape[0]}/{instance.m} covered rows."
-            )
+            assert solution_is_valid(solution, instance)
+
             cost = compute_cost(solution, instance)
-            print(f"Total cost: {cost}")
+            end = time.time()
+            t = end - start
+
+            print(f"Feasible solution of value: {cost} [time {t:.2f}]")
+
+            save_solution_to_file(
+                solution,
+                instance,
+                f"./solutions/greedy_baseline/{instance.name}.0.sol",
+            )
             break
 
         # print("Adding column {}".format(best_i))
@@ -55,7 +69,7 @@ def scgreedy(instance: Instance):
             if r == -1:
                 break
             if rowcounts[r] == 0:
-                relative_columns = transposed_matrix[r]
+                relative_columns = instance.transposed_matrix[r]
                 for rc in relative_columns:
                     if rc == -1:
                         break
@@ -70,13 +84,16 @@ def scgreedy(instance: Instance):
             end="\r",
         )
 
-    return solution
+    return solution, rowcounts, start
 
 
 if __name__ == "__main__":
     # instance_path = os.path.join("rail", "instances", "rail507")
     # instance_path = os.path.join("rail", "instances", "rail516")
     # instance_path = os.path.join("rail", "instances", "rail582")
-    instance_path = os.path.join("rail", "instances", "rail2536")
+    # instance_path = os.path.join("rail", "instances", "rail2536")
+    # instance_path = os.path.join("rail", "instances", "rail2586")
+    instance_path = os.path.join("rail", "instances", "rail4284")
+    # instance_path = os.path.join("rail", "instances", "rail4872")
     instance = import_instance(instance_path)
-    solution = scgreedy(instance)
+    solution, _ = scGreedy(instance)
