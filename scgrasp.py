@@ -56,10 +56,10 @@ def scLocalSearch(instance: Instance):
     print("--- Start Local Search ---")
     # first find a feasible solution using the greedy algorithm
     solution, rowcounts, start_time = scGreedy(instance)
-    newsols = []
     num_steps = 0
+
     while num_steps < 10:
-        # assert solution_is_valid(solution, instance)
+        newsols = []
         n_alternate_solutions_tried = 0
         num_steps += 1
         print(f"Step {num_steps}")
@@ -74,8 +74,11 @@ def scLocalSearch(instance: Instance):
                 newsol.append(column_to_add)
                 assert solution_is_valid(newsol, instance)
                 # print(compute_cost(newsol, instance))
-                if compute_cost(newsol, instance) < compute_cost(solution, instance):
-                    newsols.append((column_to_remove, column_to_add, newsol))
+                newsol_cost = compute_cost(newsol, instance)
+                if newsol_cost < compute_cost(solution, instance):
+                    newsols.append(
+                        (column_to_remove, column_to_add, newsol, newsol_cost)
+                    )
 
         if len(newsols) == 0:
             print(
@@ -84,10 +87,8 @@ def scLocalSearch(instance: Instance):
             return solution
 
         # find the best solution among the newsols
-        costs = [compute_cost(s[2], instance) for s in newsols]
+        costs = [s[3] for s in newsols]
         best_idx = np.argmin(costs)
-
-        # TODO: figure out what's wrong with this (I get an error where somewhere rowcounts is 0)
 
         # update rowcounts:
         # first subtract one to the rowcounts of the rows covered by the column that was removed
@@ -107,7 +108,7 @@ def scLocalSearch(instance: Instance):
         end = time.time()
         t = end - start_time
         print(f"Feasible solution of value: {costs[best_idx]} [time {t:.2f}]")
-        solution = newsols[best_idx][-1]
+        solution = newsols[best_idx][2]
 
 
 if __name__ == "__main__":
