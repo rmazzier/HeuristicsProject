@@ -1,8 +1,7 @@
 import numpy as np
-import matplotlib.pyplot as plt
-from functools import reduce
 import os
 import time
+import matplotlib.pyplot as plt
 
 from utils import (
     import_instance,
@@ -10,108 +9,138 @@ from utils import (
     transpose_column_major,
     compute_cost,
     solution_is_valid,
+    save_solution_to_file,
 )
 
-from scgreedy import scGreedy
 
+def scGrasp(instance: Instance, in_rowcounts, start_solution, alpha=0.95, seed=0):
+    """Solve the set covering problem on a given instance using the greedy with GRASP"""
 
-def one_opt_neighborhood(col_idx, solution, instance: Instance, rowcounts):
-    """Returns indices of columns that can replace the column of index col_idx in the solution"""
+    # define numpy rng
+    rng = np.random.default_rng(seed=seed)
 
-    # First check if the solution is valid
-    assert solution_is_valid(solution, instance)
-    assert col_idx in solution
-    assert not 0 in rowcounts
+    # print("--- Start scGrasp algorithm ---")
+    start = time.time()
 
-    rowcounts = rowcounts.copy()
-    # First, find the rows that are covered by the column of index col_idx
-    # and subtract 1 from their rowcounts
-    # If, after that, I find a row that has a rowcount of 0, then its added to the list of uncovered rows
-    uncovered = []
-    for el in instance.matrix[col_idx]:
-        if el == -1:
+    # list of zero-based indices
+    solution = start_solution
+
+    # rowcounts stores the amount of times each row is covered by the current solution
+    rowcounts = in_rowcounts.copy()
+    # else:
+    #     rowcounts = np.zeros(instance.m, dtype=np.int32)
+
+    # colcounts stores the amount of covered rows by each column, among those rows that are still uncovered by the current solution
+    colcounts = instance.covered_rows.copy()
+
+    d = []
+    e = []
+
+    while True:
+        completion = rowcounts.nonzero()[0].shape[0] / instance.m
+
+        best_score = 0
+        best_i = -1
+        all_scores = []
+
+        for i in range(instance.n):
+            score = colcounts[i] / instance.costs[i]
+            # score = colcounts[i] / instance.costs[i] ** 2
+            assert score >= 0
+            all_scores.append(score)
+
+            if score > best_score:
+                best_score = score
+                best_i = i
+
+        # Check wether no more rows can be covered, and if so, break
+        if best_i == -1:
+            assert solution_is_valid(solution, instance)
+            cost = compute_cost(solution, instance)
+            end = time.time()
+            t = end - start
+
+            # print(f"Feasible solution of value: {cost} [time {t:.2f}]")
+
+            # save_solution_to_file(
+            #     solution,
+            #     instance,
+            #     f"./solutions/grasp/{instance.name}.0.sol",
+            # )
+
+            # plt.plot(d)
+            # plt.plot(e, label="alpha")
+            # plt.grid(alpha=0.2)
+
+            # plt.legend()
+            # plt.suptitle(f"GRASP, final value: {cost}")
+            # plt.show()
             break
-        rowcounts[el] -= 1
-        if rowcounts[el] == 0:
-            uncovered.append(el)
 
-    # Now, for each uncovered row, I get all the columns that cover it
-    covering_columns_per_row = []
-    for r_idx in uncovered:
-        covering_columns = []
-        for c_idx in instance.transposed_matrix[r_idx]:
-            if c_idx == -1:
+        # max_idxs = np.argwhere(np.array(all_scores) == best_score).flatten()
+
+        sub_optimal_idxs = [
+            i
+            for i in range(len(all_scores))
+            if (all_scores[i] >= best_score - 1) and (all_scores[i] > 0)
+        ]
+
+        # alpha = min(((completion) * 2 + 0.5), 0.95)
+        e.append(alpha)
+        if rng.random() > alpha:
+            best_i = rng.choice(sub_optimal_idxs)
+
+        d.append(all_scores[best_i])
+        # print(best_i)
+
+        solution.append(best_i)
+
+        # Now update rowcounts and colcounts
+        bestcol = instance.matrix[best_i]
+
+        # now, for each row that has just been covered by best_i, look for all the columns that would cover such row, and decrease their colcount by 1,
+        # but only if that row was not already covered before.
+        for r in bestcol:
+            # if r == 377:
+            #     print("\n377 Found")
+            if r == -1:
                 break
-            covering_columns.append(c_idx)
-        covering_columns_per_row.append(covering_columns)
+            if rowcounts[r] == 0:
+                relative_columns = instance.transposed_matrix[r]
+                for rc in relative_columns:
+                    if rc == -1:
+                        break
+                    # if colcounts[rc] > 0:
+                    colcounts[rc] -= 1
+                    assert colcounts[rc] >= 0
 
-    if len(covering_columns_per_row) == 0:
-        return []
+            rowcounts[r] += 1
 
-    substitutes = reduce(np.intersect1d, covering_columns_per_row)
-    return substitutes
+        print(
+            f"Completion: {completion * 100:.3f}% ",
+            end="\r",
+        )
 
-
-def scLocalSearch(instance: Instance):
-    print("--- Start Local Search ---")
-    # first find a feasible solution using the greedy algorithm
-    solution, rowcounts, start_time = scGreedy(instance)
-    num_steps = 0
-
-    while num_steps < 10:
-        newsols = []
-        n_alternate_solutions_tried = 0
-        num_steps += 1
-        print(f"Step {num_steps}")
-        for column_to_remove in solution:
-            substitutes = one_opt_neighborhood(
-                column_to_remove, solution, instance, rowcounts
-            )
-            for column_to_add in substitutes:
-                n_alternate_solutions_tried += 1
-                newsol = solution.copy()
-                newsol.remove(column_to_remove)
-                newsol.append(column_to_add)
-                assert solution_is_valid(newsol, instance)
-                # print(compute_cost(newsol, instance))
-                newsol_cost = compute_cost(newsol, instance)
-                if newsol_cost < compute_cost(solution, instance):
-                    newsols.append(
-                        (column_to_remove, column_to_add, newsol, newsol_cost)
-                    )
-
-        if len(newsols) == 0:
-            print(
-                f"No better solution found, tried other {n_alternate_solutions_tried}"
-            )
-            return solution
-
-        # find the best solution among the newsols
-        costs = [s[3] for s in newsols]
-        best_idx = np.argmin(costs)
-
-        # update rowcounts:
-        # first subtract one to the rowcounts of the rows covered by the column that was removed
-        for j in instance.matrix[newsols[best_idx][0]]:
-            if j != -1:
-                rowcounts[j] -= 1
-            else:
-                break
-        # then add one from the rowcounts of the rows covered by the column that was added
-        for j in instance.matrix[newsols[best_idx][1]]:
-            if j != -1:
-                rowcounts[j] += 1
-            else:
-                break
-
-        assert solution_is_valid(newsols[best_idx][2], instance)
-        end = time.time()
-        t = end - start_time
-        print(f"Feasible solution of value: {costs[best_idx]} [time {t:.2f}]")
-        solution = newsols[best_idx][2]
+    return solution, compute_cost(solution, instance), rowcounts, start
 
 
 if __name__ == "__main__":
-    instance_path = os.path.join("rail", "instances", "rail582")
+    instance_path = os.path.join("rail", "instances", "rail507")
+    # instance_path = os.path.join("rail", "instances", "rail516")
+    # instance_path = os.path.join("rail", "instances", "rail582")
+    # instance_path = os.path.join("rail", "instances", "rail2536")
+    # instance_path = os.path.join("rail", "instances", "rail2586")
+    # instance_path = os.path.join("rail", "instances", "rail4284")
+    # instance_path = os.path.join("rail", "instances", "rail4872")
+
     instance = import_instance(instance_path)
-    solution = scLocalSearch(instance)
+    solution, _, _, _ = scGrasp(instance, seed=0)
+
+    # best_cost = 0
+    # for s in range(30):
+    #     instance = import_instance(instance_path)
+    #     solution, _, _ = scGrasp(instance, seed=s)
+    #     cost = compute_cost(solution, instance)
+    #     if cost < best_cost:
+    #         best_cost = cost
+    #         print(f"New best cost: {best_cost}")

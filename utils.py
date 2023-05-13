@@ -1,9 +1,34 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import numba
+from numba import jit, int64
+from numba.types import string
+from numba.experimental import jitclass
 
-from solchecker import readInstance
+# from solchecker import readInstance
+
+all_instances = [
+    "rail507",
+    "rail516",
+    "rail582",
+    "rail2536",
+    "rail2586",
+    "rail4284",
+    "rail4872",
+]
+
+spec = [
+    ("m", int64),
+    ("n", int64),
+    ("costs", int64[:]),
+    ("covered_rows", int64[:]),
+    ("matrix", int64[:, :]),
+    ("transposed_matrix", int64[:, :]),
+    ("name", string),
+]
 
 
+@jitclass(spec)
 class Instance:
     def __init__(self, m, n, costs, covered_rows, matrix, transposed_matrix, name=None):
         """Represents a rail instance"""
@@ -55,11 +80,13 @@ def import_instance(instance_path):
     )
 
 
+# @jit(nopython=True)
 def transpose_column_major(matrix, m):
     """NB: assumes input matrix is already with zero-index"""
 
-    print("Transposing matrix...")
-    transposed = [[] for _ in range(m)]
+    # print("Transposing matrix...")
+    # transposed = [[] for _ in range(m)]
+    transposed = np.empty(m, dtype=np.int64)
     for i, row in enumerate(matrix):
         for element in row:
             if element != -1:
@@ -77,6 +104,7 @@ def transpose_column_major(matrix, m):
     return np.array(padded_matrix)
 
 
+@jit(nopython=True)
 def compute_cost(solution, instance: Instance):
     cost = 0
     for s in solution:
@@ -84,6 +112,7 @@ def compute_cost(solution, instance: Instance):
     return cost
 
 
+@jit(nopython=True)
 def solution_is_valid(solution, instance):
     covered = np.zeros(instance.m)
     for c_idx in solution:
@@ -91,7 +120,8 @@ def solution_is_valid(solution, instance):
             if r_idx == -1:
                 break
             covered[r_idx] = 1
-    return all(covered)
+    # return all(covered)
+    return covered.all()
     # obj, mtx = readInstance(open("./rail/instances/rail582"))
 
     # n = instance.n
