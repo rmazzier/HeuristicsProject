@@ -70,7 +70,8 @@ def scGreedy(instance: Instance, in_rowcounts, start_solution):
         # )
 
     # remove the dummy element
-    solution = solution[1:]
+    del solution[0]
+
     return solution, compute_cost(solution, instance), rowcounts
 
 

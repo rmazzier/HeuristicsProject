@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import numba
-from numba import jit, int64
+from numba import njit, jit, int64
 from numba.types import string
 from numba.experimental import jitclass
 
@@ -80,31 +80,60 @@ def import_instance(instance_path):
     )
 
 
-# @jit(nopython=True)
+@njit
 def transpose_column_major(matrix, m):
     """NB: assumes input matrix is already with zero-index"""
 
     # print("Transposing matrix...")
-    # transposed = [[] for _ in range(m)]
-    transposed = np.empty(m, dtype=np.int64)
+
+    # Define list of typed empty lists
+    # transposed = [numba.typed.List.empty_list(numba.i8) for _ in range(m)]
+    transposed = [[0] for _ in range(m)]
+
     for i, row in enumerate(matrix):
         for element in row:
             if element != -1:
                 transposed[element].append(i)
-            pass
 
-    # pad each list to the same length
+    # We have array of lists of uneven length, so we need to pad it
     maxlen = max([len(list) for list in transposed])
-    padded_matrix = []
 
     for i in transposed:
-        # pad with -1s each list to the same length = maxlen
-        padded_matrix.append(i + [-1] * (maxlen - len(i)))
+        n_ones = maxlen - len(i)
+        for _ in range(n_ones):
+            i.append(-1)
 
-    return np.array(padded_matrix)
+        # Remove the dummy element
+        # i = i[1:]
+        del i[0]
+
+    return np.array(transposed)
 
 
-@jit(nopython=True)
+# def transpose_column_major(matrix, m):
+#     """NB: assumes input matrix is already with zero-index"""
+
+#     # print("Transposing matrix...")
+#     transposed = [[] for _ in range(m)]
+#     # transposed = np.empty(m, dtype=np.int64)
+#     for i, row in enumerate(matrix):
+#         for element in row:
+#             if element != -1:
+#                 transposed[element].append(i)
+#             pass
+
+#     # pad each list to the same length
+#     maxlen = max([len(list) for list in transposed])
+#     padded_matrix = []
+
+#     for i in transposed:
+#         # pad with -1s each list to the same length = maxlen
+#         padded_matrix.append(i + [-1] * (maxlen - len(i)))
+
+#     return np.array(padded_matrix)
+
+
+@njit
 def compute_cost(solution, instance: Instance):
     cost = 0
     for s in solution:
@@ -112,7 +141,7 @@ def compute_cost(solution, instance: Instance):
     return cost
 
 
-@jit(nopython=True)
+@njit
 def solution_is_valid(solution, instance):
     covered = np.zeros(instance.m)
     for c_idx in solution:
@@ -120,16 +149,8 @@ def solution_is_valid(solution, instance):
             if r_idx == -1:
                 break
             covered[r_idx] = 1
-    # return all(covered)
-    return covered.all()
-    # obj, mtx = readInstance(open("./rail/instances/rail582"))
 
-    # n = instance.n
-    # denseSol = np.zeros(n, dtype=np.int32)
-    # for j in solution:
-    #     denseSol[j] = 1
-    # covered = np.matmul(mtx, denseSol)
-    # return all(covered)
+    return covered.all()
 
 
 def save_solution_to_file(solution, instance, filename):
@@ -142,7 +163,4 @@ def save_solution_to_file(solution, instance, filename):
 
 
 if __name__ == "__main__":
-    instance = import_instance("./rail/instances/rail4872")
-    print(instance.matrix.shape)
-    print(transpose_column_major(instance.matrix[:, 1:], instance.m).shape)
     pass
