@@ -73,17 +73,37 @@ def build_new_instance(instance, rowcounts, removed_columns, start_solution):
 def scLocalSearch(
     instance: Instance,
     start_time,
-    n_size=5,
-    time_limit=10,
-    max_patience=500,
+    alpha,
+    time_limit,
+    max_patience,
     seed=0,
 ):
+    """
+    Solve the set covering problem on a given instance using the local search algorithm with perturbation
+
+    Parameters
+    ----------
+    instance : Instance
+        The instance to solve
+    start_time : float
+        The time at which the algorithm started
+    alpha : int
+        The number of columns to remove from the solution at each perturbation step
+    time_limit : int
+        The maximum time allowed for the algorithm to run
+    max_patience : int
+        The maximum number of iterations without improvement before perturbating the solution
+    seed : int, optional
+        The seed for the random number generator (default is 0)
+
+    """
     # Find a feasible solution using a greedy algorithm
     print("--- Finding a feasible solution ---")
     incumbent, best_cost, rowcounts = scGreedy(
         instance,
         in_rowcounts=np.zeros(instance.m, dtype=np.int32),
-        start_solution=numba.typed.List([0]),
+        # start_solution=numba.typed.List([0]),
+        start_solution=[0],
     )
     current_solution = incumbent.copy()
     current_rowcounts = rowcounts.copy()
@@ -113,7 +133,7 @@ def scLocalSearch(
             break
 
         # Remove n_size random columns from the solution
-        removed_columns = rng.choice(current_solution, size=n_size, replace=False)
+        removed_columns = rng.choice(current_solution, size=alpha, replace=False)
 
         new_instance, new_rowcounts, new_start_sol = build_new_instance(
             instance, current_rowcounts, removed_columns, current_solution
@@ -150,7 +170,7 @@ def scLocalSearch(
             patience = 0
             print(f"Patience limit [{max_patience}] reached, perturbating solution...")
             # Perturbate the solution
-            removed_columns = rng.choice(incumbent, size=n_size * 2, replace=False)
+            removed_columns = rng.choice(incumbent, size=alpha * 2, replace=False)
 
             new_instance, new_rowcounts, new_start_sol = build_new_instance(
                 instance, rowcounts, removed_columns, incumbent

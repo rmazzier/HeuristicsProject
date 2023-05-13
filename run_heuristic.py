@@ -26,14 +26,15 @@ if __name__ == "__main__":
         200,
         200,
     ]
-    for instance_path in paths:
+    for i, instance_path in enumerate(paths):
 
         start_time = time.time()
         instance = import_instance(instance_path)
         solution, cost, _ = scLocalSearch(
             instance,
-            n_size=50,
             start_time=start_time,
+            alpha=50,
+            max_patience=patience_values[i],
             time_limit=600,
             seed=0,
         )

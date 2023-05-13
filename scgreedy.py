@@ -1,16 +1,10 @@
-import numpy as np
-import os
-import time
 import matplotlib.pyplot as plt
 from numba import jit
 
 from utils import (
-    import_instance,
     Instance,
-    transpose_column_major,
     compute_cost,
     solution_is_valid,
-    save_solution_to_file,
 )
 
 
@@ -61,13 +55,6 @@ def scGreedy(instance: Instance, in_rowcounts, start_solution):
                     assert colcounts[rc] >= 0
 
             rowcounts[r] += 1
-
-        # print(
-        #     "Completion: {:.3f}% ".format(
-        #         (rowcounts.nonzero()[0].shape[0] / instance.m) * 100
-        #     ),
-        #     end="\r",
-        # )
 
     # remove the dummy element
     del solution[0]
