@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import numba
 from numba import njit, jit, int64
 from numba.types import string

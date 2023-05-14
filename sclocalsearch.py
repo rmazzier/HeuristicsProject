@@ -97,13 +97,11 @@ def scLocalSearch(
         The seed for the random number generator (default is 0)
 
     """
-    # Find a feasible solution using a greedy algorithm
     print("--- Finding a feasible solution ---")
     incumbent, best_cost, rowcounts = scGreedy(
         instance,
         in_rowcounts=np.zeros(instance.m, dtype=np.int32),
-        # start_solution=numba.typed.List([0]),
-        start_solution=[0],
+        start_solution=[0],  # quick and dirty way to tell numba the type of the list
     )
     current_solution = incumbent.copy()
     current_rowcounts = rowcounts.copy()
@@ -113,7 +111,7 @@ def scLocalSearch(
     t = end_time - start_time
     print("Feasible solution of value: {} [time {:.2f}]".format(best_cost, t))
 
-    # define numpy rng
+    # define numpy rng to allow for reproducibility
     rng = np.random.default_rng(seed=seed)
 
     step = 0
@@ -135,6 +133,7 @@ def scLocalSearch(
         # Remove n_size random columns from the solution
         removed_columns = rng.choice(current_solution, size=alpha, replace=False)
 
+        # Build a new instance of the problem with the removed columns
         new_instance, new_rowcounts, new_start_sol = build_new_instance(
             instance, current_rowcounts, removed_columns, current_solution
         )
@@ -169,6 +168,7 @@ def scLocalSearch(
         if patience > max_patience:
             patience = 0
             print(f"Patience limit [{max_patience}] reached, perturbating solution...")
+
             # Perturbate the solution
             removed_columns = rng.choice(incumbent, size=alpha * 2, replace=False)
 
@@ -186,4 +186,4 @@ def scLocalSearch(
             t = end_time - start_time
             print(f"Perturbed solution of cost {current_cost} [time {t:.2f}]]")
 
-    return incumbent, best_cost, rowcounts
+    return incumbent, best_cost

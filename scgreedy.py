@@ -1,5 +1,4 @@
-import matplotlib.pyplot as plt
-from numba import jit
+from numba import njit
 
 from utils import (
     Instance,
@@ -8,7 +7,7 @@ from utils import (
 )
 
 
-@jit(nopython=True)
+@njit
 def scGreedy(instance: Instance, in_rowcounts, start_solution):
     """Solve the set covering problem on a given instance using the greedy algorithm"""
 
@@ -56,7 +55,7 @@ def scGreedy(instance: Instance, in_rowcounts, start_solution):
 
             rowcounts[r] += 1
 
-    # remove the dummy element
+    # remove the dummy element we introduced for numba as we don't need it anymore
     del solution[0]
 
     return solution, compute_cost(solution, instance), rowcounts

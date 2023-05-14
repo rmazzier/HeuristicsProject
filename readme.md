@@ -29,7 +29,7 @@ Those are instances of [**crew scheduling problem**](https://en.wikipedia.org/wi
  
  1) A feasible solution $S$ is found by a simple Greedy algorithm. At this step, $S$ is also the incumbent, $S^*$ (the best solution found yet).
 
- 2) The neighborhood is randomly searched, as its dimension is too big to be explored exhaustively. Solutions $S' \in N(S,$ `alpha`$)$ are uniformely sampled until a new solution is found such that $C(S') < C(S)$. If so, $S= S'$. If $C(S') < C(S^*)$, then $S = S' = S^*$.
+ 2) The neighborhood is randomly searched, as its dimension is too big to be explored exhaustively. Solutions $S' \in N(S,$ `alpha`$)$ are uniformely sampled until a new solution is found such that $C(S') < C(S)$. If so, $S= S'$. If $C(S') < C(S^*) $, then $S = S' = S^* $.
  3) If after `patience` iterations $C(S') > C(S)$, the algorithm picks a random feasible solution $S \in N(S^*, 2$ `alpha`$)$ as the center of the next neighborhood to search, and goes back to step 2.
 
 The algorithm terminates after a given time budget, which was set to 10 minutes for this project.
@@ -46,14 +46,14 @@ numba==0.55.2
  
  ## Results
  The following results were obtained by running the algorithm for 10 minutes with a 11th Gen Intel(R) Core(TM) i7-11700K @ 3.60GHz CPU.
-| Instance | Greedy | Best Known | Local Search (Mine)  |   Alpha       |   Patience  | 
-|:--------:|:------:|:----------:|:----------:          |:----------:   |:----------: | 
-|  rail507 |   216  |     174    |     191              |      50         |       1000      | 
-|  rail516 |   204  |     182    |     185              |      50         |       1000     | 
-|  rail582 |   251  |     211    |     229              |      50         |       1000      | 
-| rail2536 |   894  |     689    |     829              |      50         |       200     | 
-| rail2586 |  1166  |     960    |     1101             |      50         |       200      | 
-| rail4284 |  1376  |    1077    |     1295             |      50         |       200      | 
-| rail4872 |  1902  |    1556    |     1814             |      50         |       200      | 
+| Instance | Greedy | Best Known | Local Search (Mine)  |   Alpha    |   Patience   |
+|:--------:|:------:|:----------:|:----------:          |:----------:|:----------:  |
+|  rail507 |   216  |     174    |     189              |      50    |    2000      | 
+|  rail516 |   204  |     182    |     185              |      50    |    2000      | 
+|  rail582 |   251  |     211    |     228              |      50    |    2000      | 
+| rail2536 |   894  |     689    |     829              |      50    |    400       | 
+| rail2586 |  1166  |     960    |     1101             |      50    |    400       | 
+| rail4284 |  1376  |    1077    |     1295             |      50    |    400       | 
+| rail4872 |  1902  |    1556    |     1814             |      50    |    400       | 
 
 All the experiments can be reproduced with the exact parameters of the table by running the `run_heuristic.py` file.
