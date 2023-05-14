@@ -13,13 +13,13 @@ from sclocalsearch import scLocalSearch
 if __name__ == "__main__":
 
     paths = [
-        os.path.join("rail", "instances", "rail507"),
-        # os.path.join("rail", "instances", "rail516"),
-        # os.path.join("rail", "instances", "rail582"),
-        # os.path.join("rail", "instances", "rail2536"),
-        # os.path.join("rail", "instances", "rail2586"),
-        # os.path.join("rail", "instances", "rail4284"),
-        # os.path.join("rail", "instances", "rail4872"),
+        # os.path.join("instances", "rail507"),
+        os.path.join("instances", "rail516"),
+        os.path.join("instances", "rail582"),
+        os.path.join("instances", "rail2536"),
+        os.path.join("instances", "rail2586"),
+        os.path.join("instances", "rail4284"),
+        os.path.join("instances", "rail4872"),
     ]
 
     patience_values = [
@@ -43,9 +43,3 @@ if __name__ == "__main__":
             time_limit=600,
             seed=0,
         )
-
-        # save_solution_to_file(
-        #     solution,
-        #     instance,
-        #     f"./solutions/localsearch/{instance.name}.0.sol",
-        # )

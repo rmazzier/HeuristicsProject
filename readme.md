@@ -11,6 +11,8 @@ Final project for Heuristics for Mathematical Optimization PhD Course, for which
  - rail4284
  - rail4872
 
+**Note:** To run the code, they must be downloaded and placed inside a folder called `instances`.
+
 Those are instances of [**crew scheduling problem**](https://en.wikipedia.org/wiki/Crew_scheduling) (an example of Set Covering Problem), where a set of train/plane/whatever solutions must be entirely covered by a subset of pilots/crew members, under some costrains and costs which are encoded in a sparse matrix form (column-major format). Quality of the solution is determined by the sum of the costs of its elements, which we aim to minimize.
 
 

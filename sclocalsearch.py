@@ -116,6 +116,7 @@ def scLocalSearch(
 
     step = 0
     patience = 0
+    sol_idx = 0
 
     while True:
         step += 1
@@ -163,6 +164,23 @@ def scLocalSearch(
                     f"Feasible solution of value {best_cost} [time {t:.2f}]]".format(
                         best_cost, t
                     )
+                )
+
+                sol_idx += 1
+
+                # create the directory if it does not exist
+                out_dir = os.path.join("solutions", instance.name)
+
+                os.makedirs(out_dir, exist_ok=True)
+                out_path = os.path.join(
+                    out_dir,
+                    f"{instance.name}.{sol_idx}.sol",
+                )
+
+                save_solution_to_file(
+                    incumbent,
+                    instance,
+                    out_path,
                 )
 
         if patience > max_patience:
