@@ -3,10 +3,11 @@ import time
 from numba.core.errors import NumbaDeprecationWarning, NumbaPendingDeprecationWarning
 import warnings
 
+# Ignore warnings from numba
 warnings.simplefilter("ignore", category=NumbaDeprecationWarning)
 warnings.simplefilter("ignore", category=NumbaPendingDeprecationWarning)
 
-from utils import import_instance, Instance, save_solution_to_file
+from utils import import_instance
 from sclocalsearch import scLocalSearch
 
 
@@ -25,6 +26,7 @@ if __name__ == "__main__":
     for i, instance_path in enumerate(paths):
 
         instance = import_instance(instance_path)
+
         # delete results from previous runs
         sol_path = os.path.join("solutions", instance.name)
         [

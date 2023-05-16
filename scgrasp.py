@@ -61,20 +61,6 @@ def scGrasp(instance: Instance, in_rowcounts, start_solution, alpha=0.95, seed=0
             t = end - start
 
             # print(f"Feasible solution of value: {cost} [time {t:.2f}]")
-
-            # save_solution_to_file(
-            #     solution,
-            #     instance,
-            #     f"./solutions/grasp/{instance.name}.0.sol",
-            # )
-
-            # plt.plot(d)
-            # plt.plot(e, label="alpha")
-            # plt.grid(alpha=0.2)
-
-            # plt.legend()
-            # plt.suptitle(f"GRASP, final value: {cost}")
-            # plt.show()
             break
 
         # max_idxs = np.argwhere(np.array(all_scores) == best_score).flatten()
@@ -122,25 +108,3 @@ def scGrasp(instance: Instance, in_rowcounts, start_solution, alpha=0.95, seed=0
         )
 
     return solution, compute_cost(solution, instance), rowcounts, start
-
-
-if __name__ == "__main__":
-    instance_path = os.path.join("rail", "instances", "rail507")
-    # instance_path = os.path.join("rail", "instances", "rail516")
-    # instance_path = os.path.join("rail", "instances", "rail582")
-    # instance_path = os.path.join("rail", "instances", "rail2536")
-    # instance_path = os.path.join("rail", "instances", "rail2586")
-    # instance_path = os.path.join("rail", "instances", "rail4284")
-    # instance_path = os.path.join("rail", "instances", "rail4872")
-
-    instance = import_instance(instance_path)
-    solution, _, _, _ = scGrasp(instance, seed=0)
-
-    # best_cost = 0
-    # for s in range(30):
-    #     instance = import_instance(instance_path)
-    #     solution, _, _ = scGrasp(instance, seed=s)
-    #     cost = compute_cost(solution, instance)
-    #     if cost < best_cost:
-    #         best_cost = cost
-    #         print(f"New best cost: {best_cost}")

@@ -1,25 +1,13 @@
-import numpy as np
 import os
 import time
-import numba
+import numpy as np
 from numba import njit
 
-from utils import (
-    import_instance,
-    Instance,
-    transpose_column_major,
-    compute_cost,
-    solution_is_valid,
-    all_instances,
-)
-
+from utils import Instance, save_solution_to_file
 from scgreedy import scGreedy
-from scgrasp import scGrasp
-from utils import save_solution_to_file
 
 
 @njit
-# @jit
 def build_new_instance(instance, rowcounts, removed_columns, start_solution):
     # find rows uncovered by the removed columns and update rowcounts
     uncovered_rows = [0]
@@ -79,7 +67,8 @@ def scLocalSearch(
     seed=0,
 ):
     """
-    Solve the set covering problem on a given instance using the local search algorithm with perturbation
+    Look for solutions for the set covering problem on a given instance using
+    a local search algorithm with perturbation.
 
     Parameters
     ----------
@@ -168,6 +157,7 @@ def scLocalSearch(
 
                 sol_idx += 1
 
+                # Save the solution to file
                 # create the directory if it does not exist
                 out_dir = os.path.join("solutions", instance.name)
 

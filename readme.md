@@ -37,7 +37,9 @@ Those are instances of [**crew scheduling problem**](https://en.wikipedia.org/wi
 The algorithm terminates after a given time budget, which was set to 10 minutes for this project.
 
 ## Implementation
-The algorithm was implemented in Python. To boost the code performance, I used [Numba](https://numba.pydata.org/), a powerful python package that allows to translate Python functions to optimized machine code at runtime.
+The algorithm was implemented in Python. To boost the code performance, I used [Numba](https://numba.pydata.org/), a powerful package that allows to translate Python functions to optimized machine code at runtime.
+
+All the stochastic parts of the heuristic were implemented using a NumPy random number generator with a fixed seed, to allow for consistent reproducibility. To change results, one can simply change the random seed.
 
 ## Requirements
 To run the project simply install the following Python packages
