@@ -121,8 +121,8 @@ def scLocalSearch(
     while True:
         step += 1
         patience += 1
-        if step % 100 == 0:
-            print("[Local Search] Step {}".format(step))
+        # if step % 100 == 0:
+        #     print("[Local Search] Step {}".format(step))
         end_time = time.time()
         t = end_time - start_time
         if t > time_limit:

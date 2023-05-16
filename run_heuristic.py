@@ -13,7 +13,7 @@ from sclocalsearch import scLocalSearch
 if __name__ == "__main__":
 
     paths = [
-        # os.path.join("instances", "rail507"),
+        os.path.join("instances", "rail507"),
         os.path.join("instances", "rail516"),
         os.path.join("instances", "rail582"),
         os.path.join("instances", "rail2536"),
@@ -22,24 +22,23 @@ if __name__ == "__main__":
         os.path.join("instances", "rail4872"),
     ]
 
-    patience_values = [
-        2000,
-        2000,
-        2000,
-        400,
-        400,
-        400,
-        400,
-    ]
     for i, instance_path in enumerate(paths):
 
-        start_time = time.time()
         instance = import_instance(instance_path)
+        # delete results from previous runs
+        sol_path = os.path.join("solutions", instance.name)
+        [
+            os.remove(os.path.join(sol_path, file))
+            for file in os.listdir(sol_path)
+            if file.endswith(".sol")
+        ]
+
+        start_time = time.time()
         solution, cost = scLocalSearch(
             instance,
             start_time=start_time,
             alpha=50,
-            max_patience=patience_values[i],
+            max_patience=2000,
             time_limit=600,
             seed=0,
         )

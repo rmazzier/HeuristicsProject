@@ -47,15 +47,19 @@ numba==0.55.2
 ```
  
  ## Results
- The following results were obtained by running the algorithm for 10 minutes with a 11th Gen Intel(R) Core(TM) i7-11700K @ 3.60GHz CPU.
-| Instance | Greedy | Best Known | Local Search (Mine)  |   Alpha    |   Patience   |
-|:--------:|:------:|:----------:|:----------:          |:----------:|:----------:  |
-|  rail507 |   216  |     174    |     189              |      50    |    2000      | 
-|  rail516 |   204  |     182    |     185              |      50    |    2000      | 
-|  rail582 |   251  |     211    |     228              |      50    |    2000      | 
-| rail2536 |   894  |     689    |     829              |      50    |    400       | 
-| rail2586 |  1166  |     960    |     1101             |      50    |    400       | 
-| rail4284 |  1376  |    1077    |     1295             |      50    |    400       | 
-| rail4872 |  1902  |    1556    |     1814             |      50    |    400       | 
+ In the following table, I report the best solutions I got, by running the heuristic for 10 minutes with a 11th Gen Intel(R) Core(TM) i7-11700K CPU. Hyperparameters were set to `alpha=50` and `patience=2000`. It is worth noting that further research on hyperparameter optimization, also depending on the instance size, would probably lead to better results, keeping the time budget fixed.
+ 
+ The same results are reported in the `best_results.csv` file.
 
-All the experiments can be reproduced with the exact parameters of the table by running the `run_heuristic.py` file.
+
+| Instance | Greedy | Best Known | Local Search (Mine) |  Time (seconds)      | 
+|:--------:|:------:|:----------:|:----------:         |:----------:| 
+|  rail507 |   216  |     174    |     189             |    378.63    | 
+|  rail516 |   204  |     182    |     185             |  19.97      | 
+|  rail582 |   251  |     211    |     228             |  516.49      | 
+| rail2536 |   894  |     689    |     829             |  554.41      | 
+| rail2586 |  1166  |     960    |     1101            |  554.51      | 
+| rail4284 |  1376  |    1077    |     1295            |  594.47      | 
+| rail4872 |  1902  |    1556    |     1821            |  569.86      | 
+
+All the experiments for all the instances can be reproduced by running the `run_heuristic.py` file.
