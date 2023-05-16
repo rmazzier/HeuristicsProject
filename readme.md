@@ -1,7 +1,7 @@
 # Heuristics for Mathematical Optimization 22/23
 
 ## Project description
-Final project for Heuristics for Mathematical Optimization PhD Course, for which I developed a simple heuristc to find feasible (and good) solutions the [following rail instances](http://people.brunel.ac.uk/~mastjjb/jeb/orlib/scpinfo.html).
+Final project for Heuristics for Mathematical Optimization PhD Course, for which I developed a simple heuristc to find feasible (and good) solutions for the [following rail instances](http://people.brunel.ac.uk/~mastjjb/jeb/orlib/scpinfo.html).
 
  - rail507
  - rail516
@@ -13,7 +13,7 @@ Final project for Heuristics for Mathematical Optimization PhD Course, for which
 
 **Note:** To run the code, they must be downloaded and placed inside a folder called `instances`.
 
-Those are instances of [**crew scheduling problem**](https://en.wikipedia.org/wiki/Crew_scheduling) (an example of Set Covering Problem), where a set of train/plane/whatever solutions must be entirely covered by a subset of pilots/crew members, under some costrains and costs which are encoded in a sparse matrix form (column-major format). Quality of the solution is determined by the sum of the costs of its elements, which we aim to minimize.
+These are examples of the [**crew scheduling problem**](https://en.wikipedia.org/wiki/Crew_scheduling) (an example of Set Covering Problem), where a set of train/plane/whatever solutions must be entirely covered by a subset of pilots/crew members, under some costrains and costs which are encoded in a sparse matrix form (column-major format). Quality of the solution is determined by the sum of the costs of its elements, which we aim to minimize.
 
 
 
