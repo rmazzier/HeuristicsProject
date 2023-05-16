@@ -29,10 +29,10 @@ These are examples of the [**crew scheduling problem**](https://en.wikipedia.org
 
 ### Outline of the algorithm
  
- 1) A feasible solution $S$ is found by a simple Greedy algorithm. At this step, $S$ is also the incumbent, $S^*$ (the best solution found yet).
+ 1) A feasible solution $S$ is found by a simple Greedy algorithm. At this step, $S$ is also the incumbent, $\hat{S}$ (the best solution found yet).
 
- 2) The neighborhood is randomly searched, as its dimension is too big to be explored exhaustively. Solutions $S' \in N(S,$ `alpha`$)$ are uniformely sampled until a new solution is found such that $C(S') < C(S)$. If so, $S= S'$. If $C(S') < C(S^*) $, then $S = S' = S^* $.
- 3) If after `patience` iterations $C(S') > C(S)$, the algorithm picks a random feasible solution $S \in N(S^*, 2$ `alpha`$)$ as the center of the next neighborhood to search, and goes back to step 2.
+ 2) The neighborhood is randomly searched, as its dimension is too big to be explored exhaustively. Solutions $S' \in N(S,$ `alpha`$)$ are uniformely sampled until a new solution is found such that $C(S') < C(S)$. If so, $S= S'$. If $C(S') < C(\hat{S}) $, then $S = S' = \hat{S} $.
+ 3) If after `patience` iterations $C(S') > C(S)$, the algorithm picks a random feasible solution $S \in N(\hat{S}, 2$ `alpha`$)$ as the center of the next neighborhood to search, and goes back to step 2.
 
 The algorithm terminates after a given time budget, which was set to 10 minutes for this project.
 
